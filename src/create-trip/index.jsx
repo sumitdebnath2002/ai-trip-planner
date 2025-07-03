@@ -4,14 +4,28 @@ import {
   GeoapifyContext,
 } from "@geoapify/react-geocoder-autocomplete";
 import "@geoapify/geocoder-autocomplete/styles/minimal.css";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { selectBudgetOptions, selectTravelList } from "@/constants/options";
-
+import {
+  AI_PROMPT,
+  selectBudgetOptions,
+  selectTravelList,
+} from "@/constants/options";
+import { sendMessage } from "@/service/aiModel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FcGoogle } from "react-icons/fc";
 function CreateTrip() {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState();
-
+  const [openDialogue, setOpenDialogue] = useState(false);
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -28,17 +42,42 @@ function CreateTrip() {
     handleInputChange("location", value);
   };
 
-  const OnGenerateTrip = () => {
-    const days = parseInt(formData?.noOfDays || 0, 10);
+  const OnGenerateTrip = async () => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      setOpenDialogue(true);
+      return;
+    }
+
+    const { location, budget, traveler, noOfDays } = formData || {};
+    const days = parseInt(noOfDays || 0, 10);
+    if (!location || !budget || !traveler) {
+      toast("Please fill all the details");
+      return;
+    }
     if (days > 5) {
-      alert("Sorry! Currently we only support trips up to 5 days.");
+      toast("Sorry! Currently we only support trips up to 5 days.");
       return; // Ensure this exits the function
     }
     if (days <= 0) {
-      alert("Please enter a valid number of days.");
+      toast("Please enter a valid number of days.");
       return;
     }
-    console.log("Trip Data Submitted:", formData);
+
+    const locationString =
+      location?.properties?.formatted ||
+      location?.properties?.address_line1 ||
+      location?.properties?.city ||
+      "your destination";
+
+    const FINAL_PROMPT = AI_PROMPT.replace("{location}", locationString)
+      .replace("{totalDays}", formData?.noOfDays) // Changed from {noOfDays}
+      .replace("{budget}", formData?.budget)
+      .replace("{traveler}", formData?.traveler)
+      .replace("{budget}", formData?.budget); // Fixed typo from {trveler}
+
+    const result = await sendMessage(FINAL_PROMPT);
+    console.log("AI Response:", result);
   };
 
   return (
@@ -58,8 +97,12 @@ function CreateTrip() {
           <GeoapifyContext apiKey={import.meta.env.VITE_GEOAPIFY_API_KEY}>
             <GeoapifyGeocoderAutocomplete
               placeholder="Enter your destination"
-              filter={{ countryCodes: ["in"] }}
+              filterByCountryCode={["in"]} // Changed from countryCodes
+              biasByLocation="ip" // Or use specific coordinates
               placeSelect={handlePlaceSelect}
+              onSuggestionsError={(error) =>
+                console.error("Geocoder error:", error)
+              }
             />
           </GeoapifyContext>
         </div>
@@ -68,8 +111,9 @@ function CreateTrip() {
             How many days are you planning your trip?
           </h2>
           <Input
-            placeholder={"Ex.3"}
+            placeholder="Ex.3"
             type="number"
+            value={formData?.noOfDays || ""}
             onChange={(e) => handleInputChange("noOfDays", e.target.value)}
           />
         </div>
@@ -123,6 +167,21 @@ function CreateTrip() {
       <div className="my-10 justify-end flex">
         <Button onClick={OnGenerateTrip}>Generate Trip</Button>
       </div>
+      <Dialog open={openDialogue}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <img src="/logo.svg"></img>
+              <h2 className="font-bold text-lg mt-7">Sign In with Google</h2>
+              <p>Sign in to the App with Google Authentication securly</p>
+              <Button className="w-full mt-5 flex gap-4 items-center">
+                <FcGoogle className="h-7 w-7" />
+                Sign In with Google{" "}
+              </Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
