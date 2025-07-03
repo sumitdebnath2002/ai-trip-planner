@@ -22,6 +22,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+
 function CreateTrip() {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState();
@@ -42,6 +45,10 @@ function CreateTrip() {
     handleInputChange("location", value);
   };
 
+  const login = useGoogleLogin({
+    onSuccess: (codeResp) => GetUserProfile(codeResp),
+    onError: (error) => console.log(error),
+  });
   const OnGenerateTrip = async () => {
     const user = localStorage.getItem("user");
     if (!user) {
@@ -76,10 +83,42 @@ function CreateTrip() {
       .replace("{traveler}", formData?.traveler)
       .replace("{budget}", formData?.budget); // Fixed typo from {trveler}
 
-    const result = await sendMessage(FINAL_PROMPT);
-    console.log("AI Response:", result);
+    const resp = await sendMessage(FINAL_PROMPT);
+    console.log("fetching ai result");
+    const cleanedJSON = (() => {
+      try {
+        // Extract JSON content using regex (from first `{` to the last `}`)
+        const jsonMatch = resp.match(/{[\s\S]*}/); // greedy match of all content inside outermost {}
+        if (!jsonMatch) throw new Error("No valid JSON found");
+
+        // Parse the matched string into a JS object
+        const result = JSON.parse(jsonMatch[0]);
+        console.log(result);
+      } catch (err) {
+        console.error("Failed to extract JSON:", err);
+        return null;
+      }
+    })();
   };
 
+  const GetUserProfile = (tokenInfo) => {
+    axios
+      .get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo?.access_token}`,
+            Accept: "Application/json",
+          },
+        }
+      )
+      .then((resp) => {
+        console.log(resp);
+        localStorage.setItem("user", JSON.stringify(resp.data));
+        setOpenDialogue(false);
+        OnGenerateTrip();
+      });
+  };
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-72 px-5 mt-10">
       <h2 className="font-bold text-3xl">
@@ -174,7 +213,10 @@ function CreateTrip() {
               <img src="/logo.svg"></img>
               <h2 className="font-bold text-lg mt-7">Sign In with Google</h2>
               <p>Sign in to the App with Google Authentication securly</p>
-              <Button className="w-full mt-5 flex gap-4 items-center">
+              <Button
+                onClick={login}
+                className="w-full mt-5 flex gap-4 items-center"
+              >
                 <FcGoogle className="h-7 w-7" />
                 Sign In with Google{" "}
               </Button>
