@@ -22,13 +22,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FcGoogle } from "react-icons/fc";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/service/firebaseConfig";
 function CreateTrip() {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState();
   const [openDialogue, setOpenDialogue] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -49,6 +52,7 @@ function CreateTrip() {
     onSuccess: (codeResp) => GetUserProfile(codeResp),
     onError: (error) => console.log(error),
   });
+
   const OnGenerateTrip = async () => {
     const user = localStorage.getItem("user");
     if (!user) {
@@ -77,28 +81,37 @@ function CreateTrip() {
       location?.properties?.city ||
       "your destination";
 
+    setLoading(true);
     const FINAL_PROMPT = AI_PROMPT.replace("{location}", locationString)
       .replace("{totalDays}", formData?.noOfDays) // Changed from {noOfDays}
       .replace("{budget}", formData?.budget)
       .replace("{traveler}", formData?.traveler)
       .replace("{budget}", formData?.budget); // Fixed typo from {trveler}
 
-    const resp = await sendMessage(FINAL_PROMPT);
     console.log("fetching ai result");
-    const cleanedJSON = (() => {
-      try {
-        // Extract JSON content using regex (from first `{` to the last `}`)
-        const jsonMatch = resp.match(/{[\s\S]*}/); // greedy match of all content inside outermost {}
-        if (!jsonMatch) throw new Error("No valid JSON found");
+    let resp = await sendMessage(FINAL_PROMPT);
+    // console.log(resp);
+    resp = resp.trim();
+    resp = resp.replace(/^```json\s*|```$/g, "").trim();
+    console.log(resp);
+    setLoading(false);
+    SaveAiTrip(resp);
+  };
 
-        // Parse the matched string into a JS object
-        const result = JSON.parse(jsonMatch[0]);
-        console.log(result);
-      } catch (err) {
-        console.error("Failed to extract JSON:", err);
-        return null;
-      }
-    })();
+  const SaveAiTrip = async (TripData) => {
+    // Add a new document in collection "cities"
+    setLoading(true);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const docId = Date.now().toString();
+    //reference of db name of collection and name of document
+    await setDoc(doc(db, "AiTrips", docId), {
+      userSelection: formData,
+      tripData: JSON.parse(TripData),
+      userEmail: user?.email,
+      id: docId,
+    });
+
+    setLoading(false);
   };
 
   const GetUserProfile = (tokenInfo) => {
@@ -204,7 +217,13 @@ function CreateTrip() {
         </div>
       </div>
       <div className="my-10 justify-end flex">
-        <Button onClick={OnGenerateTrip}>Generate Trip</Button>
+        <Button disabled={loading} onClick={OnGenerateTrip}>
+          {loading ? (
+            <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
+          ) : (
+            "GenerateTrip"
+          )}
+        </Button>
       </div>
       <Dialog open={openDialogue}>
         <DialogContent>
