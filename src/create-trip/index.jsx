@@ -217,8 +217,12 @@ function CreateTrip() {
           })}
         </div>
       </div>
-      <div className="my-10 justify-end flex">
-        <Button disabled={loading} onClick={OnGenerateTrip}>
+      <div className="my-10 justify-end flex ">
+        <Button
+          disabled={loading}
+          onClick={OnGenerateTrip}
+          className="hover:cursor-pointer hover:bg-gray-900 hover:scale-110"
+        >
           {loading ? (
             <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
           ) : (
