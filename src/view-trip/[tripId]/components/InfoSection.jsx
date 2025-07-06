@@ -22,10 +22,10 @@ function InfoSection(tripInfo) {
               📅{tripInfo?.trip?.userSelection?.noOfDays} Days
             </h2>
             <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-500 text-xs md:text-sm">
-              💸{tripInfo?.trip?.userSelection?.budget} Days
+              💸{tripInfo?.trip?.userSelection?.budget} Budget
             </h2>
             <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-500 text-xs md:text-sm">
-              🥂{tripInfo?.trip?.userSelection?.traveler} Days
+              🥂{tripInfo?.trip?.userSelection?.traveler}
             </h2>
           </div>
         </div>
