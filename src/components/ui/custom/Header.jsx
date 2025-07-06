@@ -83,7 +83,7 @@ function Header() {
                   onClick={() => {
                     googleLogout();
                     localStorage.clear();
-                    window.location.reload();
+                    window.location.href = "/";
                   }}
                 >
                   Logout
