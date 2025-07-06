@@ -50,4 +50,4 @@ export const selectBudgetOptions = [
   },
 ];
 
-export const AI_PROMPT = `Generate Travel Plan for Location: {location}, for {totalDays} Days for {traveler} with a {budget} budget, give me Hotels options list with iteneraries planned for {totalDays} days with each day plan with best time to visit in json format, only return json response and nothing else`;
+export const AI_PROMPT = `Generate Travel Plan for Location: {location}, for {totalDays} Days for {traveler} with a {budget} budget, give me Hotels options list with iteneraries planned for {totalDays} days with each day plan with best time to visit in json format, try to give 4 hotels atleast only return json response and nothing else, donot include any comment or unnecessary things inside the json as im directly putting it to json.parse`;

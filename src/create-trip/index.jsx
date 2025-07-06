@@ -27,8 +27,10 @@ import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/service/firebaseConfig";
+import { useNavigate, useNavigation } from "react-router";
 function CreateTrip() {
   const [place, setPlace] = useState();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState();
   const [openDialogue, setOpenDialogue] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -112,6 +114,7 @@ function CreateTrip() {
     });
 
     setLoading(false);
+    navigate(`/view-trip/${docId}`);
   };
 
   const GetUserProfile = (tokenInfo) => {
@@ -149,8 +152,6 @@ function CreateTrip() {
           <GeoapifyContext apiKey={import.meta.env.VITE_GEOAPIFY_API_KEY}>
             <GeoapifyGeocoderAutocomplete
               placeholder="Enter your destination"
-              filterByCountryCode={["in"]} // Changed from countryCodes
-              biasByLocation="ip" // Or use specific coordinates
               placeSelect={handlePlaceSelect}
               onSuggestionsError={(error) =>
                 console.error("Geocoder error:", error)
@@ -248,50 +249,3 @@ function CreateTrip() {
 }
 
 export default CreateTrip;
-
-// {
-//   "type": "Feature",
-//   "bbox": [-115.4242845, 36.129554, -115.062066, 36.3808406],
-//   "geometry": {
-//     "type": "Point",
-//     "coordinates": [-115.1483538, 36.1672719]
-//   },
-//   "properties": {
-//     "address_line1": "Las Vegas, NV",
-//     "address_line2": "United States of America",
-//     "category": "administrative",
-//     "city": "Las Vegas",
-//     "country": "United States",
-//     "country_code": "us",
-//     "county": "Clark County",
-//     "datasource": {
-//       "sourcename": "openstreetmap",
-//       "attribution": "© OpenStreetMap contributors",
-//       "license": "Open Database License",
-//       "url": "https://www.openstreetmap.org/copyright"
-//     },
-//     "formatted": "Las Vegas, NV, United States of America",
-//     "iso3166_2": "US-NV",
-//     "lat": 36.1672719,
-//     "lon": -115.1483538,
-//     "place_id": "5130cfefa07ec95cc0591805662a69154240f00101f9018598020000000000c00208",
-//     "plus_code": "85865V82+WM",
-//     "plus_code_short": "82+WM Las Vegas, Clark County, United States",
-//     "rank": {
-//       "importance": 0.7126172021753994,
-//       "confidence": 1,
-//       "confidence_city_level": 1,
-//       "match_type": "full_match"
-//     },
-//     "result_type": "city",
-//     "state": "Nevada",
-//     "state_code": "NV",
-//     "timezone": {
-//       "name": "America/Los_Angeles",
-//       "offset_STD": "-08:00",
-//       "offset_STD_seconds": -28800,
-//       "offset_DST": "-07:00",
-//       "offset_DST_seconds": -25200
-//     }
-//   }
-// }
