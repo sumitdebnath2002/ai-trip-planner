@@ -42,8 +42,6 @@ export default function ViewTrip() {
       <Hotel trip={trip}></Hotel>
       {/* Daily Plan */}
       <PlacesToVisit trip={trip}></PlacesToVisit>
-      {/* Footer */}
-      <Footer trip={trip} />
     </div>
   );
 }
