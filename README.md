@@ -19,7 +19,7 @@ This application provides users with a friendly interface to input their travel 
 
 💬 Conversational AI (Future): A planned chatbot feature will provide real-time assistance and answer your travel-related questions.
 
-🛠️ Built With
+🛠️ Built With:
 This project is built using a modern and robust technology stack:
 
 Frontend:
