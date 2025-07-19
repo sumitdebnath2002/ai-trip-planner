@@ -107,9 +107,6 @@ If you have a suggestion that would make this better, please fork the repo and c
    ```
 5. Open a Pull Request
 
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📧 Contact
 
