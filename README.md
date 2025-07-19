@@ -19,7 +19,7 @@ This application provides users with a friendly interface to input their travel 
 
 💬 Conversational AI (Future): A planned chatbot feature will provide real-time assistance and answer your travel-related questions.
 
-🛠️ Built With:
+🛠️ Built With
 This project is built using a modern and robust technology stack:
 
 Frontend:
@@ -53,7 +53,7 @@ npm install npm@latest -g
 Installation
 Clone the repository
 
-git clone https://github.com/sumitdebnath2002/ai-trip-planner.git
+git clone [https://github.com/sumitdebnath2002/ai-trip-planner.git](https://github.com/sumitdebnath2002/ai-trip-planner.git)
 
 Navigate into the project directory
 
