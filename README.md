@@ -1,5 +1,3 @@
-Certainly! Here’s your README, rewritten with proper Markdown formatting so commands, environment variables, and code blocks stand out. This is suitable for GitHub and will present well to users and contributors.
-
 # ✈️ AI Trip Planner
 
 An intelligent, AI-powered travel planner that creates personalized and optimized itineraries to make your travel planning seamless and enjoyable. Stop researching, start exploring!
